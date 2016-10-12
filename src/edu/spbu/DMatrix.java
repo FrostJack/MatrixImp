@@ -72,8 +72,8 @@ public class DMatrix extends Matrix {
         if (A.m != B.n) throw new RuntimeException("Illegal matrix dimensions.");
         SMatrix C = new SMatrix(A.n, B.m);
         for (Map.Entry<Coordinate, Double> e : B.data.entrySet())
-            for (int i = 0; i < B.n; i++) {
-                Coordinate k = new Coordinate(i, e.getKey().m);
+            for (int i = 0; i < A.n; i++) {
+                Coordinate k = new Coordinate(i + 1, e.getKey().m);
                 C.data.put(k, C.data.getOrDefault(k, 0.0) + e.getValue()*(A.data[i][e.getKey().n - 1]));
             }
         return C;

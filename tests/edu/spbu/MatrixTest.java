@@ -26,7 +26,22 @@ public class MatrixTest {
         SMatrix s2 = new SMatrix("dmatrix2.txt");
         SMatrix s3 = new SMatrix("goldenddmatrix.txt");
         assertTrue(s1.mul(s2).equals(s3));
+    }
 
+    @Test
+    public void testSDMul() {
+        SMatrix s1 = new SMatrix("dmatrix1.txt");
+        DMatrix d1 = new DMatrix("dmatrix2.txt");
+        SMatrix s2 = new SMatrix("goldenddmatrix.txt");
+        assertTrue(s1.mul(d1).equals(s2));
+    }
+
+    @Test
+    public void testDSMul() {
+        DMatrix d1 = new DMatrix("dmatrix1.txt");
+        SMatrix s1 = new SMatrix("dmatrix2.txt");
+        SMatrix s3 = new SMatrix("goldenddmatrix.txt");
+        assertTrue(d1.mul(s1).equals(s3));
     }
 
 }

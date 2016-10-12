@@ -75,7 +75,7 @@ public class SMatrix extends Matrix{
         SMatrix C = new SMatrix (A.n, B.m);
         for (Map.Entry<Coordinate, Double> e : A.data.entrySet())
             for (int j = 0; j < B.m; j++) {
-                Coordinate k = new Coordinate(e.getKey().n, j);
+                Coordinate k = new Coordinate(e.getKey().n, j + 1);
                 C.data.put(k, C.data.getOrDefault(k, 0.0) + e.getValue()*(B.data[e.getKey().m - 1][j]));
             }
         return C;
