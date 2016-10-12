@@ -20,4 +20,13 @@ public class MatrixTest {
 
     }
 
+    @Test
+    public void testSSMul() {
+        SMatrix s1 = new SMatrix("dmatrix1.txt");
+        SMatrix s2 = new SMatrix("dmatrix2.txt");
+        SMatrix s3 = new SMatrix("goldenddmatrix.txt");
+        assertTrue(s1.mul(s2).equals(s3));
+
+    }
+
 }

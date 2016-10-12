@@ -54,7 +54,7 @@ public class SMatrix extends Matrix{
     public Matrix mul (Matrix B){
         if (B instanceof SMatrix) return (this.mul((SMatrix) B));
         else return (this.mul((DMatrix) B));
-    }
+}
 
     public SMatrix mul (SMatrix B){
         SMatrix A = this;
@@ -74,9 +74,9 @@ public class SMatrix extends Matrix{
         if (A.m != B.n) throw new RuntimeException("Illegal matrix dimensions.");
         SMatrix C = new SMatrix (A.n, B.m);
         for (Map.Entry<Coordinate, Double> e : A.data.entrySet())
-            for (int j = 1; j < B.m; j++) {
+            for (int j = 0; j < B.m; j++) {
                 Coordinate k = new Coordinate(e.getKey().n, j);
-                C.data.put(k, C.data.getOrDefault(k, 0.0) + e.getValue()*(B.data[e.getKey().m][j]));
+                C.data.put(k, C.data.getOrDefault(k, 0.0) + e.getValue()*(B.data[e.getKey().m - 1][j]));
             }
         return C;
     }
@@ -102,7 +102,8 @@ public class SMatrix extends Matrix{
 
     public double getelement( int i, int j) {
         Coordinate q = new Coordinate(i, j);
+        int a = 0;
         if (this.data.containsKey(q)) return (this.data.get(q));
-        else return(0);
+        else return(a);
     }
 }
