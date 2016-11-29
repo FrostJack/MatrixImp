@@ -58,11 +58,12 @@ public class DMatrix extends Matrix {
     public DMatrix mul(DMatrix B) {
         DMatrix A = this;
         if (A.m != B.n) throw new RuntimeException("Illegal matrix dimensions.");
-        DMatrix C = new DMatrix(A.n, B.m);
+        DMatrix D = B.transpon();
+        DMatrix C = new DMatrix(A.n, D.n);
         for (int i = 0; i < C.n; i++)
             for (int j = 0; j < C.m; j++)
                 for (int k = 0; k < A.m; k++) {
-                    C.data[i][j] += (A.data[i][k]) * (B.data[k][j]);
+                    C.data[i][j] += (A.data[i][k]) * (D.data[j][k]);
                 }
         return C;
     }
@@ -85,5 +86,15 @@ public class DMatrix extends Matrix {
 
     public double getelement (int i, int j){
         return this.data[i-1][j-1];
+    }
+
+    public DMatrix transpon () {
+        DMatrix A = this;
+        DMatrix B = new DMatrix (this.m, this.n);
+        for (int i = 0; i < A.n; i++)
+            for (int j = 0; j < A.m; j++) {
+            B.data[j][i] = A.data[i][j];
+            }
+        return B;
     }
 }

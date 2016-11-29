@@ -25,10 +25,10 @@ abstract public class Matrix {
 
     public boolean equals (Object other) {
         if (other instanceof Matrix) {
-            if ((this.n == other.n) & (this.m == other.m)) {
+            if ((this.n == ((Matrix) other).n) & (this.m == ((Matrix) other).m)) {
                 for (int i = 1; i < this.n; i++)
                     for (int j = 1; j < this.m; j++) {
-                        if (this.getelement(i, j) != other.getelement(i, j)) return false;
+                        if (this.getelement(i, j) != ((Matrix) other).getelement(i, j)) return false;
                     }
                 return true;
             } else return false;
