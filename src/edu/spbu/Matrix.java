@@ -7,7 +7,7 @@ import java.io.IOException;
  * Created by Evgueni on 27.09.2016.
  */
 abstract public class Matrix {
-    int n; //number of raws
+    int n; //number of rows
     int m; //number of coloumns
 
     public abstract String toString ();

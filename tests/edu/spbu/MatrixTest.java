@@ -16,8 +16,11 @@ public class MatrixTest {
         DMatrix d1 = new DMatrix("dmatrix1.txt");
         DMatrix d2 = new DMatrix("dmatrix2.txt");
         DMatrix d3 = new DMatrix("goldenddmatrix.txt");
-        assertTrue(d1.mul(d2).equals(d3));
-
+        try {
+            assertTrue(d1.mul(d2).equals(d3));
+        } catch (InterruptedException e0) {
+            e0.printStackTrace();
+        }
     }
 
     @Test

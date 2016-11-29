@@ -51,23 +51,61 @@ public class DMatrix extends Matrix {
     }
 
     public Matrix mul (Matrix B){
-        if (B instanceof DMatrix) return (this.mul((DMatrix) B));
+        if (B instanceof DMatrix)
+            try {
+            return(this.mul((DMatrix) B));
+            } catch (InterruptedException e){
+                e.printStackTrace();
+                return null;
+            }
         else return (this.mul((SMatrix) B));
     }
 
-    public DMatrix mul(DMatrix B) {
+    public DMatrix mul(DMatrix B) throws InterruptedException {
         DMatrix A = this;
         if (A.m != B.n) throw new RuntimeException("Illegal matrix dimensions.");
         DMatrix D = B.transpon();
         DMatrix C = new DMatrix(A.n, D.n);
-        for (int i = 0; i < C.n; i++)
-            for (int j = 0; j < C.m; j++)
-                for (int k = 0; k < A.m; k++) {
-                    C.data[i][j] += (A.data[i][k]) * (D.data[j][k]);
-                }
+        final int temp = Runtime.getRuntime().availableProcessors();
+        Thread thread[] = new Thread[temp];
+        mulStream s = new mulStream(A, D, C);
+        for (int i = 0; i < temp; i++){
+            thread[i] = new Thread(s);
+            thread[i].start();
+        }
+
+        for (int i = 0; i < temp; i++)
+            thread[i].join();
+
         return C;
     }
 
+    private class mulStream implements Runnable {
+        int t = 0;
+        DMatrix A;
+        DMatrix D;
+        DMatrix C;
+
+        private mulStream (DMatrix A, DMatrix D, DMatrix C){
+            this.A = A;
+            this.D = D;
+            this.C = C;
+        }
+
+        public void run(){
+            for (int i = nextRow(); i < A.n; i = nextRow())
+                for (int j = 0; j < D.n; j++)
+                    for (int k = 0; k < A.m; k++)
+                        C.data[i][j] += A.data[i][k] * D.data[j][k];
+        }
+
+        private int nextRow() {
+            synchronized (this){
+                return t++;
+            }
+        }
+
+    }
     public SMatrix mul (SMatrix B){
         DMatrix A = this;
         if (A.m != B.n) throw new RuntimeException("Illegal matrix dimensions.");
