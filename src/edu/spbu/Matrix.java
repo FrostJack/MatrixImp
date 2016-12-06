@@ -8,7 +8,7 @@ import java.io.IOException;
  */
 abstract public class Matrix {
     int n; //number of rows
-    int m; //number of coloumns
+    int m; //number of columns
 
     public abstract String toString ();
 

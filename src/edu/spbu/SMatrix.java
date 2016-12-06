@@ -7,9 +7,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by Evgueni on 27.09.2016.
@@ -52,21 +51,67 @@ public class SMatrix extends Matrix{
     }
 
     public Matrix mul (Matrix B){
-        if (B instanceof SMatrix) return (this.mul((SMatrix) B));
+        if (B instanceof SMatrix)
+            try {
+                return(this.mul((SMatrix) B));
+            } catch (InterruptedException e){
+                e.printStackTrace();
+                return null;
+            }
         else return (this.mul((DMatrix) B));
 }
 
-    public SMatrix mul (SMatrix B){
+    public SMatrix mul (SMatrix B) throws InterruptedException {
         SMatrix A = this;
         if (A.m != B.n) throw new RuntimeException("Illegal matrix dimensions.");
         SMatrix C = new SMatrix (A.n, B.m);
-        for (Map.Entry<Coordinate, Double> e1 : A.data.entrySet())
-            for (Map.Entry<Coordinate, Double> e2: B.data.entrySet())
-                if (e1.getKey().m == e2.getKey().n) {
-                    Coordinate k3 = new Coordinate(e1.getKey().n, e2.getKey().m);
-                    C.data.put(k3, C.data.getOrDefault(k3, 0.0) + e1.getValue()*e2.getValue());
+        final int temp = Runtime.getRuntime().availableProcessors();
+        Thread thread[] = new Thread[temp];
+        mulStream s = new mulStream(A, B, C);
+
+        for (int i = 0; i < temp; i++){
+            thread[i] = new Thread(s);
+            thread[i].start();
+        }
+
+        for (int i = 0; i < temp; i++)
+            thread[i].join();
+
+        return C;
+    }
+
+    private class mulStream implements Runnable {
+        boolean f;
+        Iterator<Map.Entry<Coordinate, Double>> i;
+        SMatrix A;
+        SMatrix B;
+        SMatrix C;
+
+        private mulStream (SMatrix A, SMatrix B, SMatrix C){
+            this.f = true;
+            this.i = A.data.entrySet().iterator();
+            this.A = A;
+            this.B = B;
+            this.C = C;
+        }
+
+        public void run() {
+                for (Map.Entry<Coordinate, Double> e = nextMapElement(); i.hasNext(); e = nextMapElement()) {
+                    for (Map.Entry<Coordinate, Double> e2 : B.data.entrySet())
+                        if (e.getKey().m == e2.getKey().n) {
+                            Coordinate k3 = new Coordinate(e.getKey().n, e2.getKey().m);
+                            C.data.put(k3, C.data.getOrDefault(k3, 0.0) + e.getValue() * e2.getValue());
+                        }
                 }
-        return(C);
+        }
+
+        private Map.Entry<Coordinate, Double> nextMapElement() {
+            synchronized (this) {
+                if (i.hasNext())
+                    return i.next();
+                else return null;
+            }
+        }
     }
 
     public SMatrix mul (DMatrix B){
