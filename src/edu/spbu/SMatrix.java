@@ -14,12 +14,12 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by Evgueni on 27.09.2016.
  */
 public class SMatrix extends Matrix{
-    HashMap<Coordinate, Double> data;
+    Map<Coordinate, Double> data;
 
     public SMatrix(int n, int m) {
         this.n = n;
         this.m = m;
-        this.data = new HashMap<Coordinate, Double>();
+        this.data = new Hashtable<Coordinate, Double>();
     }
 
     public SMatrix(String filename) {
@@ -34,7 +34,7 @@ public class SMatrix extends Matrix{
             this.n = ArList.size();
             this.m = ArList.get(0).split("\\s+").length;
             double c;
-            this.data = new HashMap<Coordinate, Double>();
+            this.data = new Hashtable<Coordinate, Double>();
             for (int i = 0; i < n; i++) {
                 String[] StringSplit = ArList.get(i).split("\\s+");
                 for (int j = 0; j < m; j++) {
@@ -81,34 +81,35 @@ public class SMatrix extends Matrix{
     }
 
     private class mulStream implements Runnable {
-        boolean f;
-        Iterator<Map.Entry<Coordinate, Double>> i;
+        Iterator<Map.Entry<Coordinate, Double>> j;
         SMatrix A;
         SMatrix B;
         SMatrix C;
 
         private mulStream (SMatrix A, SMatrix B, SMatrix C){
-            this.f = true;
-            this.i = A.data.entrySet().iterator();
+            this.j = A.data.entrySet().iterator();
             this.A = A;
             this.B = B;
             this.C = C;
         }
 
         public void run() {
-                for (Map.Entry<Coordinate, Double> e = nextMapElement(); i.hasNext(); e = nextMapElement()) {
-                    for (Map.Entry<Coordinate, Double> e2 : B.data.entrySet())
-                        if (e.getKey().m == e2.getKey().n) {
-                            Coordinate k3 = new Coordinate(e.getKey().n, e2.getKey().m);
-                            C.data.put(k3, C.data.getOrDefault(k3, 0.0) + e.getValue() * e2.getValue());
-                        }
-                }
+            Map.Entry<Coordinate, Double> e = nextMapElement();
+            while (!(e == null)) {
+                for (Map.Entry<Coordinate, Double> e2 : B.data.entrySet())
+                    if (e.getKey().m == e2.getKey().n) {
+                        Coordinate k3 = new Coordinate(e.getKey().n, e2.getKey().m);
+                        C.data.put(k3, C.data.getOrDefault(k3, 0.0) + e.getValue() * e2.getValue());
+                    }
+                e = nextMapElement();
+            }
         }
+
 
         private Map.Entry<Coordinate, Double> nextMapElement() {
             synchronized (this) {
-                if (i.hasNext())
-                    return i.next();
+                if (j.hasNext())
+                    return j.next();
                 else return null;
             }
         }
