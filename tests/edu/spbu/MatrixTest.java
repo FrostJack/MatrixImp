@@ -30,7 +30,6 @@ public class MatrixTest {
         SMatrix s3 = new SMatrix("goldenddmatrix.txt");
         try {
             assertTrue(s1.mul(s2).equals(s3));
-            s1.mul(s2).toFile("m3.txt");
         } catch (InterruptedException e0) {
             e0.printStackTrace();
         }
